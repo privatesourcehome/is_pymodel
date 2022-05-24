@@ -4,13 +4,14 @@ MEM_SIZE=1000
 comment=('#','//')
 reg={'r1':0, 'r2':0, 'r3':0, 'r4':0, 'result':0, 'pc':0, 'EXIT':False, 'EQ':False}
 vreg={'vr1':0, 'vr2':0, 'vr3':0, 'vr4':0, 'vr5':0}
-addr={'adr1':0, 'adr2':1, 'adr3':2, 'adr4':3}
+addr={'adr1':0, 'adr2':1, 'adr3':2, 'adr4':3, 'adr5':4}
 memory=[0]*MEM_SIZE
 vmemory=[0]*MEM_SIZE
 vmemory[0] = np.array([1,0,1])
 vmemory[1] = np.array([1,1,3])
 vmemory[2] = np.array([1,0,1])
 vmemory[3] = np.array([1,-2,3,-4,5])
+vmemory[4] = np.array([1, 0, 3, 0, 5])
 
 # Memory operation
 def LOAD_V(opr):
@@ -83,16 +84,13 @@ def __DEBUG_ASSERT_SCALAR_VALUE(opr):
     assert reg[opr[0]] == int(opr[1]) and __DEBUG_PRT_SUC_MSG(
         msg='__DEBUG_ASSERT_VALUE Test Success'), 'fail'
     reg['pc'] = reg['pc']+1
-def __DEBUG_ASSERT_VECTOR_VALUE(opr):
-    assert reg[opr[0]] == np.array(opr[1]) and __DEBUG_PRT_SUC_MSG(
-        msg='__DEBUG_ASSERT_VALUE Test Success'), 'fail'
+def __DEBUG_ASSERT_SCALAR_REG(opr):
+    assert reg[opr[0]] == reg[opr[1]] and __DEBUG_PRT_SUC_MSG(
+        msg='__DEBUG_ASSERT_REG Test Success'), 'fail'
     reg['pc'] = reg['pc']+1
 def __DEBUG_ASSERT_VECTOR_REG(opr):
-    assert vreg[opr[0]] == vreg[opr[1]] and __DEBUG_PRT_SUC_MSG(
+    assert np.array_equal(vreg[opr[0]], vreg[opr[1]]) and __DEBUG_PRT_SUC_MSG(
         msg='__DEBUG_ASSERT_VALUE Test Success'), 'fail'
-    reg['pc'] = reg['pc']+1
-def __DEBUG_ASSERT_SCALAR_REG(opr):
-    assert reg[opr[0]] == reg[opr[1]] and __DEBUG_PRT_SUC_MSG(msg='__DEBUG_ASSERT_REG Test Success'), 'fail'
     reg['pc'] = reg['pc']+1
 def __DEBUG_PRTREG(opr):
     print(reg[opr[0]])

@@ -11,6 +11,7 @@
 6 __DEBUG_ASSERT_SCALAR_VALUE r2 2
 # vr5 = [1*1 + 0*0 + 1*1] -> 2 (dot-product)
 7 LOAD_V vr4 adr4
-8 VReLU vr1 vr4
-9 __DEBUG_ASSERT_VECTOR_VALUE vr1 [1,0,3,0,5]
-10 __DEBUG_EXIT
+8 LOAD_V vr5 adr5
+9 VReLU vr1 vr4
+10 __DEBUG_ASSERT_VECTOR_REG vr1 vr5
+11 __DEBUG_EXIT
