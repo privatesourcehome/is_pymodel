@@ -102,7 +102,7 @@ def __DEBUG_PRT_SUC_MSG(msg='success!'):
     print(msg)
     return True
  
-# SYSTEM_INIT
+# SYSTEM
 def __EXEC_ASM():
     while reg['EXIT'] == False:
         if int(reg['pc'])>MEM_SIZE:
