@@ -102,6 +102,17 @@ def __DEBUG_PRT_SUC_MSG(msg='success!'):
     print(msg)
     return True
  
+#Unused function
+def ADD_SS(opr):
+    reg[opr[0]] = reg[opr[1]] + reg[opr[2]]
+    reg['pc']=reg['pc']+1
+def SUB_SS(opr):
+    reg[opr[0]] = reg[opr[1]] - reg[opr[2]]
+    reg['pc'] = reg['pc']+1
+def MUL_SS(opr):
+    reg[opr[0]] = reg[opr[1]] * reg[opr[2]]
+    reg['pc'] = reg['pc']+1
+ 
 # SYSTEM
 def __EXEC_ASM():
     while reg['EXIT'] == False:
@@ -114,7 +125,7 @@ def __EXEC_ASM():
         op(memory[i][1:])
         pass
 def __INIT_IMEM():
-    file = open('C:/Users/hooki/Documents/GitHub/is_pymodel/vtest.asm', 'r')
+    file = open('./vtest.asm', 'r')
     for line in file:
         if line.startswith(comment[:]):
             continue
