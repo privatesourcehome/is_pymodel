@@ -147,7 +147,7 @@ def __EXEC_ASM():
         op(memory[i][1:])
         pass
 def __INIT_IMEM():
-    file = open('./vtest.asm', 'r')
+    file = open('./conv_test.asm', 'r')
     for line in file:
         if line.startswith(comment[:]):
             continue
