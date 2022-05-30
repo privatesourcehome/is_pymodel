@@ -1,22 +1,27 @@
 import numpy as np
 
-MEM_SIZE=1000
-comment=('#','//')
-reg={'r1':0, 'r2':0, 'r3':0, 'r4':0, 'result':0, 'pc':0, 'EXIT':False, 'EQ':False}
-vreg={'vr1':0, 'vr2':0, 'vr3':0, 'vr4':0, 'vr5':0}
-addr={'adr1':0, 'adr2':1, 'adr3':2, 'adr4':3, 'adr5':4}
-memory=[0]*MEM_SIZE
-vmemory=[0]*MEM_SIZE
-vmemory[0] = np.array([1,0,1])
-vmemory[1] = np.array([1,1,3])
-vmemory[2] = np.array([1,0,1])
-vmemory[3] = np.array([1,-2,3,-4,5])
-vmemory[4] = np.array([1, 0, 3, 0, 5])
+MEM_SIZE=10000000
+comment = ('#','//') 
+reg = {'r1': 0, 'r2': 0, 'r3': 0, 'r4': 0,
+       'r5': 0, 'r6': 0, 'r7': 0, 'r8': 0, 'r9': 0, 'r10': 0, 'r11': 0, 'r12': 0, }
+spreg = {'result': 0,'pc': 0, 'EXIT': False, 'EQ': False}
+vreg = {'vr1':0, 'vr2':0, 'vr3':0, 'vr4':0, 'vr5':0}
+addr = {'adr1': 0, 'adr2': 1, 'adr3': 2, 'adr4': 3, 'adr5': 4}
+memory  = [0] * MEM_SIZE
+vmemory = [0] * MEM_SIZE
+img = np.load('lena_gray.npy')
+for i in range(0, img.shape[0]):
+    vmemory[i] = img[i]
 
 # Memory operation
 def LOAD_V(opr):
+    vreg[opr[0]] = vmemory[opr[1]]
+    reg['pc'] = reg['pc']+1
+    '''
+def LOAD_V(opr):
     vreg[opr[0]] = vmemory[addr[opr[1]]]
     reg['pc'] = reg['pc']+1
+    '''
 def LOAD_S(opr):
     reg[opr[0]]=memory[reg[opr[1]]]
     reg['pc']=reg['pc']+1
@@ -29,6 +34,10 @@ def STORE_S(opr):
 def STORE_V(opr):
     vmemory[reg[opr[1]]]=vreg[opr[0]]
     reg['pc']=reg['pc']+1
+def MOV_VS(opr):
+    # vreg 지정, 몇번째 데이터, to reg
+    reg[opr[0]] = vmemory[opr[1]][opr[2]]
+    reg['pc'] = reg['pc']+1
     
 # Control operation
 def JUMP(opr):
