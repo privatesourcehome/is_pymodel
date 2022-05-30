@@ -3,15 +3,19 @@ import numpy as np
 MEM_SIZE=10000000
 comment = ('#','//') 
 reg = {'r1': 0, 'r2': 0, 'r3': 0, 'r4': 0,
-       'r5': 0, 'r6': 0, 'r7': 0, 'r8': 0, 'r9': 0, 'r10': 0, 'r11': 0, 'r12': 0, }
+       'r5': 0, 'r6': 0, 'r7': 0, 'r8': 0, 'r9': 0, 'r10': 0, 'r11': 0, 'r12': 0, 'r13': 0, 'r14': 0, 'r15': 0, 'r16': 0, 'r17': 0, 'r18': 0}
 spreg = {'result': 0,'pc': 0, 'EXIT': False, 'EQ': False}
 vreg = {'vr1':0, 'vr2':0, 'vr3':0, 'vr4':0, 'vr5':0}
 addr = {'adr1': 0, 'adr2': 1, 'adr3': 2, 'adr4': 3, 'adr5': 4}
 memory  = [0] * MEM_SIZE
 vmemory = [0] * MEM_SIZE
+kmemory = [0] * MEM_SIZE
 img = np.load('lena_gray.npy')
 for i in range(0, img.shape[0]):
     vmemory[i] = img[i]
+krn = np.load('sobel_x_kernel.npy')
+for i in range(0, krn.shape[0]):
+    memory[5000000+i] = krn[i]
 
 # Memory operation
 def LOAD_V(opr):
