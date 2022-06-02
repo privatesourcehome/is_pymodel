@@ -7,6 +7,7 @@ reg = {'r1': 0, 'r2': 0, 'r3': 0, 'r4': 0,
 vreg = {'vr0':0, 'vr1':0, 'vr2':0, 'vr3':0, 'vr4':0, 'vr5':0}
 addr = {'adr1': 0, 'adr2': 1, 'adr3': 2, 'adr4': 3, 'adr5': 4}
 memory  = [0] * MEM_SIZE
+imemory = [0] * MEM_SIZE
 vmemory = [0] * MEM_SIZE
 img = np.load('lena_gray.npy')
 for i in range(0, img.shape[0]):
@@ -14,10 +15,9 @@ for i in range(0, img.shape[0]):
 krn = np.load('sobel_x_kernel.npy')
 for i in range(0, krn.shape[0]):
     memory[5000000+i] = krn[i]
-out = np.load('zeros.npy')
+out = np.load('C:/Users/hooki/Documents/GitHub/is_pymodel/zeros.npy')
 for i in range(0, out.shape[0]):
-    memory[7000000+i] = out[i]
-
+    memory[7000000+i] = list(out[i])
 # Memory operation
 def LOAD_V(opr):
     vreg[opr[0]] = vmemory[int(opr[1])]
@@ -40,7 +40,7 @@ def STORE_S(opr):
     reg['pc']=reg['pc']+1
 '''
 def STORE_S(opr):
-    memory[opr[1]][opr[2]] = vreg[opr[0]]
+    memory[int(opr[1])][int(opr[2])] = reg[opr[0]]
     reg['pc'] = reg['pc']+1
 def STORE_V(opr):
     vmemory[reg[opr[1]]]=vreg[opr[0]]
@@ -145,8 +145,8 @@ def __EXEC_ASM():
             break
         i = reg['pc']
         print("current pc : " + str(reg['pc']))
-        op = globals()[memory[i][0]]
-        op(memory[i][1:])
+        op = globals()[imemory[i][0]]
+        op(imemory[i][1:])
         pass
 def __INIT_IMEM():
     file = open('./conv_test.asm', 'r')
@@ -155,7 +155,7 @@ def __INIT_IMEM():
             continue
         instruction = line.split() 
         if instruction:
-            memory[int(instruction[0])] = instruction[1:]
+            imemory[int(instruction[0])] = instruction[1:]
 
 __INIT_IMEM()
 __EXEC_ASM()
