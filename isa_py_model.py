@@ -150,6 +150,7 @@ def __EXEC_ASM():
         i = reg['pc']
         print("current pc : " + str(reg['pc']))
         if(reg['pc'] == 1770249):
+            print(memory[7000000:7000256])
             np.save('./output', memory[7000000:7000256])
         op = globals()[imemory[i][0]]
         op(imemory[i][1:])
