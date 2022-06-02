@@ -1,5 +1,5 @@
 import numpy as np
-out = open('./conv_test_out.asm', 'w', encoding='utf-8')
+out = open('./conv_test.asm', 'w', encoding='utf-8')
 MEM_SIZE=10000000
 comment = ('#','//') 
 reg = {'r1': 0, 'r2': 0, 'r3': 0, 'r4': 0,
@@ -12,11 +12,12 @@ vmemory = [0] * MEM_SIZE
 img = np.load('lena_gray.npy')
 for i in range(0, img.shape[0]):
     vmemory[i] = img[i]
-krn = np.load('sobel_x_kernel.npy')
+krn = np.load('sobel_y_kernel.npy')
 for i in range(0, 3):
     for j in range(0, 3):
         memory[5000000+i] = krn[i][j]
-out = np.load('C:/Users/hooki/Documents/GitHub/is_pymodel/zeros.npy')
+        print(memory[5000000+i])
+out = np.load('zeros.npy')
 for i in range(0, out.shape[0]):
     memory[7000000+i] = list(out[i])
 # Memory operation
