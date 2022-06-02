@@ -13,9 +13,10 @@ img = np.load('lena_gray.npy')
 for i in range(0, img.shape[0]):
     vmemory[i] = img[i]
 krn = np.load('sobel_x_kernel.npy')
-for i in range(0, krn.shape[0]):
-    memory[5000000+i] = krn[i]
-out = np.load('zeros.npy')
+for i in range(0, 3):
+    for j in range(0, 3):
+        memory[5000000+i] = krn[i][j]
+out = np.load('C:/Users/hooki/Documents/GitHub/is_pymodel/zeros.npy')
 for i in range(0, out.shape[0]):
     memory[7000000+i] = list(out[i])
 # Memory operation
