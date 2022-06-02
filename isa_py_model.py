@@ -1,5 +1,5 @@
 import numpy as np
-
+out = open('./conv_test_out.asm', 'w', encoding='utf-8')
 MEM_SIZE=10000000
 comment = ('#','//') 
 reg = {'r1': 0, 'r2': 0, 'r3': 0, 'r4': 0,
@@ -15,7 +15,7 @@ for i in range(0, img.shape[0]):
 krn = np.load('sobel_x_kernel.npy')
 for i in range(0, krn.shape[0]):
     memory[5000000+i] = krn[i]
-out = np.load('C:/Users/hooki/Documents/GitHub/is_pymodel/zeros.npy')
+out = np.load('zeros.npy')
 for i in range(0, out.shape[0]):
     memory[7000000+i] = list(out[i])
 # Memory operation
@@ -120,6 +120,8 @@ def __DEBUG_PRTREG(opr):
 def __DEBUG_EXIT(opr):
     reg['EXIT'] = True
     reg['pc'] = reg['pc']+1
+def __DEBUG_BREAK(opr):
+    reg['pc'] = reg['pc']+1
 def __DEBUG_PRT_SUC_MSG(msg='success!'):
     
     print(msg)
@@ -145,9 +147,12 @@ def __EXEC_ASM():
             break
         i = reg['pc']
         print("current pc : " + str(reg['pc']))
+        if(reg['pc'] == 1770249):
+            np.save('./output', memory[7000000:7000256])
         op = globals()[imemory[i][0]]
         op(imemory[i][1:])
         pass
+        
 def __INIT_IMEM():
     file = open('./conv_test.asm', 'r')
     for line in file:
