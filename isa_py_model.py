@@ -14,6 +14,9 @@ for i in range(0, img.shape[0]):
 krn = np.load('sobel_x_kernel.npy')
 for i in range(0, krn.shape[0]):
     memory[5000000+i] = krn[i]
+out = np.load('zeros.npy')
+for i in range(0, out.shape[0]):
+    memory[7000000+i] = out[i]
 
 # Memory operation
 def LOAD_V(opr):
@@ -30,9 +33,15 @@ def LOAD_S(opr):
 def LOAD_SI(opr):
     reg[opr[0]]=int(opr[1])
     reg['pc']=reg['pc']+1
+
+'''
 def STORE_S(opr):
     memory[int(opr[1])]=reg[opr[0]]
     reg['pc']=reg['pc']+1
+'''
+def STORE_S(opr):
+    memory[opr[1]][opr[2]] = vreg[opr[0]]
+    reg['pc'] = reg['pc']+1
 def STORE_V(opr):
     vmemory[reg[opr[1]]]=vreg[opr[0]]
     reg['pc']=reg['pc']+1
