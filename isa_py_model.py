@@ -51,7 +51,11 @@ def STORE_V(opr):
     reg['pc']=reg['pc']+1
 def MOV_VS(opr):
     # vreg 지정, 몇번째 데이터, to reg
+<<<<<<< HEAD
     reg[opr[0]] = vmemory[opr[1]][opr[2]]
+=======
+    reg[opr[0]] = vreg[opr[1]][int(opr[2])]
+>>>>>>> parent of 955e0a8 (ongoing)
     reg['pc'] = reg['pc']+1
     
 # Control operation
@@ -140,6 +144,7 @@ def MUL_SS(opr):
     reg['pc'] = reg['pc']+1
  
 # SYSTEM
+
 def __EXEC_ASM():
     while reg['EXIT'] == False:
         if int(reg['pc'])>MEM_SIZE:
