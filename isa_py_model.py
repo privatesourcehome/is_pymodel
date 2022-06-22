@@ -140,7 +140,6 @@ def MUL_SS(opr):
     reg['pc'] = reg['pc']+1
  
 # SYSTEM
-
 def __EXEC_ASM():
     while reg['EXIT'] == False:
         if int(reg['pc'])>MEM_SIZE:
