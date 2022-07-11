@@ -35,12 +35,14 @@ krn = np.load('sobel_x_kernel.npy')
 for i in range(0, krn.shape[0]):
     memory[5000000+i] = krn[i]
 out = np.load('C:/Users/hooki/Documents/GitHub/is_pymodel/zeros.npy')
+
 for i in range(0, out.shape[0]):
     memory[10000000+i] = out[i]
 
 # Memory operation
 
 def LOAD_V(opr):
+
     for i in range(0, 196):
         vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
         vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0x00FF0000) >> 16
@@ -49,6 +51,7 @@ def LOAD_V(opr):
     implicit_reg['pc'] = implicit_reg['pc']+1
 def LOAD_VS(opr):
     pass
+
     '''
     for i in range(0, 196):
         vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
@@ -58,6 +61,7 @@ def LOAD_VS(opr):
     '''
     implicit_reg['pc'] = implicit_reg['pc']+1
 def LOAD_S(opr):
+
     reg[opr[0]]=memory[int(opr[1])]
     implicit_reg['pc']=implicit_reg['pc']+1
 def STORE_V(opr):
@@ -74,7 +78,7 @@ def STORE_S(opr):
 def MOV(opr):
     reg[opr[0]] = int(opr[1])
     implicit_reg['pc'] = implicit_reg['pc']+1
-
+    
 # Control operation
 def JUMP(opr):
     implicit_reg['pc']=int(opr[0])
@@ -124,6 +128,7 @@ def VReLU(opr):
 # Debug function // 그런데, 해저드를 생각하면 DEBUG_PASS를 NOP로 사용하는게 옳지 않을까? -> hazard를 보기
 def __DEBUG_PASS(opr):
     implicit_reg['pc'] = implicit_reg['pc']+1  
+
 def __DEBUG_PRTREG(opr):
     print(reg[opr[0]])
     implicit_reg['pc'] = implicit_reg['pc']+1
@@ -135,7 +140,7 @@ def __DEBUG_PRT_SUC_MSG(msg):
 def __DEBUG_EXIT(opr):
     implicit_reg['EXIT'] = True
     implicit_reg['pc'] = implicit_reg['pc']+1
-    
+   
 # SYSTEM
 def __EXEC_ASM():
     while reg['EXIT'] == False:
