@@ -42,35 +42,23 @@ for i in range(0, out.shape[0]):
 # Memory operation
 
 def LOAD_V(opr):
-
     for i in range(0, 196):
         vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
-        vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0x00FF0000) >> 16
-        vreg[opr[0]][i*4+2] = (memory[reg[opr[1]]+i] & 0x0000FF00) >> 8
-        vreg[opr[0]][i*4+3] = (memory[reg[opr[1]]+i] & 0x000000FF)
+        vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0xFF0000) >> 16
+        vreg[opr[0]][i*4+2] = (memory[reg[opr[1]]+i] & 0xFF00) >> 8
+        vreg[opr[0]][i*4+3] = (memory[reg[opr[1]]+i] & 0xFF)
     implicit_reg['pc'] = implicit_reg['pc']+1
 def LOAD_VS(opr):
-    pass
-
-    '''
-    for i in range(0, 196):
-        vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
-        vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0x00FF0000) >> 16
-        vreg[opr[0]][i*4+2] = (memory[reg[opr[1]]+i] & 0x0000FF00) >> 8
-        vreg[opr[0]][i*4+3] = (memory[reg[opr[1]]+i] & 0x000000FF)
-    '''
+    # TODO
     implicit_reg['pc'] = implicit_reg['pc']+1
 def LOAD_S(opr):
-
     reg[opr[0]]=memory[int(opr[1])]
     implicit_reg['pc']=implicit_reg['pc']+1
 def STORE_V(opr):
-    pass
     # TODO
     implicit_reg['pc'] = implicit_reg['pc']+1
 def STORE_VS(opr):
-    for i in (0,196):
-        memory[int(opr[1]):int(opr[1])+195] = vreg[opr[0]]
+    # TODO
     implicit_reg['pc'] = implicit_reg['pc']+1
 def STORE_S(opr):
     memory[int(opr[1])][int(opr[2])] = reg[opr[0]]
@@ -78,18 +66,6 @@ def STORE_S(opr):
 def MOV(opr):
     reg[opr[0]] = int(opr[1])
     implicit_reg['pc'] = implicit_reg['pc']+1
-    
-# Control operation
-def JUMP(opr):
-    implicit_reg['pc']=int(opr[0])
-def JE(opr):
-    if implicit_reg['cmpreg'] == True:
-        implicit_reg['pc'] = int(opr[0])
-    else: implicit_reg['pc'] = implicit_reg['pc']+1    
-def JNE(opr):
-    if implicit_reg['cmpreg'] == False:
-        implicit_reg['pc'] = int(opr[0])
-    else: implicit_reg['pc'] = implicit_reg['pc']+1
 
 # ALU operation
 def ADD_VV(opr):
@@ -109,6 +85,9 @@ def SUB_VS(opr):
     for i in range(0,3):
       vreg[opr[0]][i] = vreg[opr[0]][i]-reg[opr[1]]
     implicit_reg['pc']=implicit_reg['pc']+1
+def SUB_SS(opr):
+    reg[opr[0]] = reg[opr[1]] - reg[opr[2]]
+    implicit_reg['pc']=implicit_reg['pc']+1    
 def MUL_VV(opr):
     for i in range(0, 3):
           vreg[opr[0]][i] = vreg[opr[1]][i]*vreg[opr[2]][i]
@@ -117,18 +96,35 @@ def MUL_VS(opr):
     for i in range(0, 3):
       vreg[opr[0]][i] = vreg[opr[0]][i]*reg[opr[1]]
     implicit_reg['pc'] = implicit_reg['pc']+1
+def MUL_SS(opr):
+    reg[opr[0]] = reg[opr[1]] * reg[opr[2]]
+    implicit_reg['pc'] = implicit_reg['pc']+1
 def CMP(opr):
     implicit_reg['cmpreg'] = reg[opr[0]] - vreg[opr[1]]
     implicit_reg['pc'] = implicit_reg['pc']+1
-def VReLU(opr):
+def ReLU_V(opr):
+    # TODO
     for i in range(0,4):
       vreg[opr][i] = int(vreg[opr][i]*(vreg[opr][i]>0))
     implicit_reg['pc'] = implicit_reg['pc']+1
 
+# Control operation
+def JUMP(opr):
+    implicit_reg['pc'] = int(opr[0])
+def JE(opr):
+    if implicit_reg['cmpreg'] == 0:
+        implicit_reg['pc'] = int(opr[0])
+    else:
+        implicit_reg['pc'] = implicit_reg['pc']+1
+def JNE(opr):
+    if implicit_reg['cmpreg'] != 0:
+        implicit_reg['pc'] = int(opr[0])
+    else:
+        implicit_reg['pc'] = implicit_reg['pc']+1
+
 # Debug function // 그런데, 해저드를 생각하면 DEBUG_PASS를 NOP로 사용하는게 옳지 않을까? -> hazard를 보기
 def __DEBUG_PASS(opr):
     implicit_reg['pc'] = implicit_reg['pc']+1  
-
 def __DEBUG_PRTREG(opr):
     print(reg[opr[0]])
     implicit_reg['pc'] = implicit_reg['pc']+1
@@ -136,11 +132,11 @@ def __DEBUG_PRT_SUC_MSG(msg):
     print(msg+' test success!')
     return True
 
-# Shutdown Interrupt
+# Shutdown
 def __DEBUG_EXIT(opr):
     implicit_reg['EXIT'] = True
     implicit_reg['pc'] = implicit_reg['pc']+1
-   
+
 # SYSTEM
 def __EXEC_ASM():
     while reg['EXIT'] == False:
@@ -149,14 +145,11 @@ def __EXEC_ASM():
             break
         i = implicit_reg['pc']
         print("current pc : " + str(implicit_reg['pc']))
-        
         if(implicit_reg['pc'] == 1180425):
             np.save('./output_lightweight', memory[7000000:7000256])
-        
         op = globals()[imemory[i][0]]
         op(imemory[i][1:])
         pass
-        
 def __INIT_IMEM():
     file = open('./conv_test_lightweight.asm', 'r')
     for line in file:
