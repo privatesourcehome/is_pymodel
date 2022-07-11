@@ -1,166 +1,164 @@
 import numpy as np
-out = open('./conv_test.asm', 'w', encoding='utf-8')
-MEM_SIZE=10000000
-comment = ('#','//') 
-reg = {'r1': 0, 'r2': 0, 'r3': 0, 'r4': 0,
-       'r5': 0, 'r6': 0, 'r7': 0, 'r8': 0, 'r9': 0, 'r10': 0, 'r11': 0, 'r12': 0, 'r13': 0, 'r14': 0, 'r15': 0, 'r16': 0, 'r17': 0, 'r18': 0}
-spreg = {'result': 0,'pc': 0, 'EXIT': False, 'EQ': False}
-vreg = {'vr1':0, 'vr2':0, 'vr3':0, 'vr4':0, 'vr5':0}
-addr = {'adr1': 0, 'adr2': 1, 'adr3': 2, 'adr4': 3, 'adr5': 4}
+# numpy is only used for data load&save
+
+# Memory is 128MB both data & instruction
+MEM_SIZE = 128000000
+comment = ('#','//')
+reg = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+# 코드 길이상 16개만 예시로 들었음.
+vreg = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+implicit_reg = {'EXIT': False, 'pc': 0, 'cmpreg': 0}
+
 memory  = [0] * MEM_SIZE
 imemory = [0] * MEM_SIZE
-vmemory = [0] * MEM_SIZE
-kmemory = [0] * MEM_SIZE
-img = np.load('lena_gray.npy')
-for i in range(0, img.shape[0]):
-    vmemory[i] = img[i]
-krn = np.load('sobel_y_kernel.npy')
-for i in range(0, 3):
-    for j in range(0, 3):
-        memory[5000000+i] = krn[i][j]
-        print(memory[5000000+i])
-out = np.load('zeros.npy')
-for i in range(0, out.shape[0]):
-    memory[7000000+i] = list(out[i])
-# Memory operation
-def LOAD_V(opr):
-    vreg[opr[0]] = vmemory[opr[1]]
-    reg['pc'] = reg['pc']+1
-    '''
-def LOAD_V(opr):
-    vreg[opr[0]] = vmemory[addr[opr[1]]]
-    reg['pc'] = reg['pc']+1
-    '''
-def LOAD_S(opr):
-    reg[opr[0]]=memory[reg[opr[1]]]
-    reg['pc']=reg['pc']+1
-def LOAD_SI(opr):
-    reg[opr[0]]=int(opr[1])
-    reg['pc']=reg['pc']+1
 
-'''
-def STORE_S(opr):
-    memory[int(opr[1])]=reg[opr[0]]
-    reg['pc']=reg['pc']+1
-'''
+# Memory Load Process
+image = np.load('lena_gray.npy')
+for i in range(0, image.shape[0]):
+    memory[i] = image[i]
+krn = np.load('sobel_x_kernel.npy')
+for i in range(0, krn.shape[0]):
+    memory[5000000+i] = krn[i]
+out = np.load('C:/Users/hooki/Documents/GitHub/is_pymodel/zeros.npy')
+
+for i in range(0, out.shape[0]):
+    memory[10000000+i] = out[i]
+
+# Memory operation
+
+def LOAD_V(opr):
+
+    for i in range(0, 196):
+        vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
+        vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0x00FF0000) >> 16
+        vreg[opr[0]][i*4+2] = (memory[reg[opr[1]]+i] & 0x0000FF00) >> 8
+        vreg[opr[0]][i*4+3] = (memory[reg[opr[1]]+i] & 0x000000FF)
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def LOAD_VS(opr):
+    pass
+
+    '''
+    for i in range(0, 196):
+        vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
+        vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0x00FF0000) >> 16
+        vreg[opr[0]][i*4+2] = (memory[reg[opr[1]]+i] & 0x0000FF00) >> 8
+        vreg[opr[0]][i*4+3] = (memory[reg[opr[1]]+i] & 0x000000FF)
+    '''
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def LOAD_S(opr):
+
+    reg[opr[0]]=memory[int(opr[1])]
+    implicit_reg['pc']=implicit_reg['pc']+1
+def STORE_V(opr):
+    pass
+    # TODO
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def STORE_VS(opr):
+    for i in (0,196):
+        memory[int(opr[1]):int(opr[1])+195] = vreg[opr[0]]
+    implicit_reg['pc'] = implicit_reg['pc']+1
 def STORE_S(opr):
     memory[int(opr[1])][int(opr[2])] = reg[opr[0]]
-    reg['pc'] = reg['pc']+1
-def STORE_V(opr):
-    vmemory[reg[opr[1]]]=vreg[opr[0]]
-    reg['pc']=reg['pc']+1
-def MOV_VS(opr):
-    # vreg 지정, 몇번째 데이터, to reg
-<<<<<<< HEAD
-    reg[opr[0]] = vmemory[opr[1]][opr[2]]
-=======
-    reg[opr[0]] = vreg[opr[1]][int(opr[2])]
->>>>>>> parent of 955e0a8 (ongoing)
-    reg['pc'] = reg['pc']+1
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def MOV(opr):
+    reg[opr[0]] = int(opr[1])
+    implicit_reg['pc'] = implicit_reg['pc']+1
     
 # Control operation
 def JUMP(opr):
-    reg['pc']=int(opr[0])
-def JNE(opr):
-    if reg['EQ'] == False:
-        reg['pc'] = int(opr[0])
-    else: reg['pc'] = reg['pc']+1
+    implicit_reg['pc']=int(opr[0])
 def JE(opr):
-    if reg['EQ'] == True:
-        reg['pc'] = int(opr[0])
-    else: reg['pc'] = reg['pc']+1
-def BE(opr):
-    if reg['EQ'] == True:
-        reg['pc'] = reg['pc'] + int(opr[0])
-    else: reg['pc'] = reg['pc']+1
-def BNE(opr):
-    if reg['EQ'] == False:
-        reg['pc'] = reg['pc'] + int(opr[0])
-    else: reg['pc'] = reg['pc']+1
-    
+    if implicit_reg['cmpreg'] == True:
+        implicit_reg['pc'] = int(opr[0])
+    else: implicit_reg['pc'] = implicit_reg['pc']+1    
+def JNE(opr):
+    if implicit_reg['cmpreg'] == False:
+        implicit_reg['pc'] = int(opr[0])
+    else: implicit_reg['pc'] = implicit_reg['pc']+1
+
 # ALU operation
 def ADD_VV(opr):
     vreg[opr[0]] = vreg[opr[1]] + vreg[opr[2]]
-    reg['pc']=reg['pc']+1
+    implicit_reg['pc']=implicit_reg['pc']+1
 def ADD_VS(opr):
-    vreg[opr[0]] = vreg[opr[1]] + reg[opr[2]]
-    reg['pc']=reg['pc']+1
-def SUB_VV(opr):
-    vreg[opr[0]] = vreg[opr[1]] - vreg[opr[2]]
-    reg['pc']=reg['pc']+1
-def SUB_VS(opr):
-    vreg[opr[0]] = vreg[opr[1]] - reg[opr[2]]
-    reg['pc']=reg['pc']+1
-def MUL_VV(opr):
-    reg[opr[0]] = np.dot(vreg[opr[1]], np.transpose(vreg[opr[2]]))
-    reg['pc'] = reg['pc']+1
-def MUL_VS(opr):
-    vreg[opr[0]] = vreg[opr[1]] * vreg[opr[2]]
-    reg['pc'] = reg['pc']+1
-def CMP(opr):
-    reg['result'] = reg[opr[0]]-reg[opr[1]]
-    if(reg['result']==0):
-        reg['EQ']=True
-    else: reg['EQ']=False
-    reg['pc'] = reg['pc']+1
-def VReLU(opr):
-    vreg[opr[0]] = vreg[opr[1]]*(vreg[opr[1]]>0)
-    reg['pc'] = reg['pc']+1
-
-# Debug function
-def __DEBUG_ASSERT_SCALAR_VALUE(opr):
-    assert reg[opr[0]] == int(opr[1]) and __DEBUG_PRT_SUC_MSG(
-        msg='__DEBUG_ASSERT_VALUE Test Success'), 'fail'
-    reg['pc'] = reg['pc']+1
-def __DEBUG_ASSERT_SCALAR_REG(opr):
-    assert reg[opr[0]] == reg[opr[1]] and __DEBUG_PRT_SUC_MSG(
-        msg='__DEBUG_ASSERT_REG Test Success'), 'fail'
-    reg['pc'] = reg['pc']+1
-def __DEBUG_ASSERT_VECTOR_REG(opr):
-    assert np.array_equal(vreg[opr[0]], vreg[opr[1]]) and __DEBUG_PRT_SUC_MSG(
-        msg='__DEBUG_ASSERT_VALUE Test Success'), 'fail'
-    reg['pc'] = reg['pc']+1
-def __DEBUG_PRTREG(opr):
-    print(reg[opr[0]])
-    reg['pc'] = reg['pc']+1
-def __DEBUG_EXIT(opr):
-    reg['EXIT'] = True
-    reg['pc'] = reg['pc']+1
-def __DEBUG_BREAK(opr):
-    reg['pc'] = reg['pc']+1
-def __DEBUG_PRT_SUC_MSG(msg='success!'):
-    print(msg)
-    return True
- 
-#Unused function
+    for i in range(0,3):
+      vreg[opr[0]][i] = vreg[opr[0]][i]+reg[opr[1]]
+    implicit_reg['pc']=implicit_reg['pc']+1
 def ADD_SS(opr):
     reg[opr[0]] = reg[opr[1]] + reg[opr[2]]
-    reg['pc']=reg['pc']+1
-def SUB_SS(opr):
-    reg[opr[0]] = reg[opr[1]] - reg[opr[2]]
-    reg['pc'] = reg['pc']+1
-def MUL_SS(opr):
-    reg[opr[0]] = reg[opr[1]] * reg[opr[2]]
-    reg['pc'] = reg['pc']+1
- 
-# SYSTEM
+    implicit_reg['pc']=implicit_reg['pc']+1
+def SUB_VV(opr):
+    vreg[opr[0]] = vreg[opr[1]] - vreg[opr[2]]
+    implicit_reg['pc']=implicit_reg['pc']+1
+def SUB_VS(opr):
+    for i in range(0,3):
+      vreg[opr[0]][i] = vreg[opr[0]][i]-reg[opr[1]]
+    implicit_reg['pc']=implicit_reg['pc']+1
+def MUL_VV(opr):
+    for i in range(0, 3):
+          vreg[opr[0]][i] = vreg[opr[1]][i]*vreg[opr[2]][i]
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def MUL_VS(opr):
+    for i in range(0, 3):
+      vreg[opr[0]][i] = vreg[opr[0]][i]*reg[opr[1]]
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def CMP(opr):
+    implicit_reg['cmpreg'] = reg[opr[0]] - vreg[opr[1]]
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def VReLU(opr):
+    for i in range(0,4):
+      vreg[opr][i] = int(vreg[opr][i]*(vreg[opr][i]>0))
+    implicit_reg['pc'] = implicit_reg['pc']+1
 
+# Debug function // 그런데, 해저드를 생각하면 DEBUG_PASS를 NOP로 사용하는게 옳지 않을까? -> hazard를 보기
+def __DEBUG_PASS(opr):
+    implicit_reg['pc'] = implicit_reg['pc']+1  
+
+def __DEBUG_PRTREG(opr):
+    print(reg[opr[0]])
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def __DEBUG_PRT_SUC_MSG(msg):
+    print(msg+' test success!')
+    return True
+
+# Shutdown Interrupt
+def __DEBUG_EXIT(opr):
+    implicit_reg['EXIT'] = True
+    implicit_reg['pc'] = implicit_reg['pc']+1
+   
+# SYSTEM
 def __EXEC_ASM():
     while reg['EXIT'] == False:
-        if int(reg['pc'])>MEM_SIZE:
+        if int(implicit_reg['pc'])>MEM_SIZE:
             reg['EXIT'] == True
             break
-        i = reg['pc']
-        print("current pc : " + str(reg['pc']))
-        if(reg['pc'] == 1770249):
-            print(memory[7000000:7000256])
-            np.save('./output', memory[7000000:7000256])
+        i = implicit_reg['pc']
+        print("current pc : " + str(implicit_reg['pc']))
+        
+        if(implicit_reg['pc'] == 1180425):
+            np.save('./output_lightweight', memory[7000000:7000256])
+        
         op = globals()[imemory[i][0]]
         op(imemory[i][1:])
         pass
         
 def __INIT_IMEM():
-    file = open('./vtest.asm', 'r')
+    file = open('./conv_test_lightweight.asm', 'r')
     for line in file:
         if line.startswith(comment[:]):
             continue
