@@ -43,7 +43,7 @@ def STORE_VS(opr):
     # TODO
     implicit_reg['pc'] = implicit_reg['pc']+1
 def STORE_S(opr):
-    memory[int(opr[1])][int(opr[2])] = reg[opr[0]]
+    memory[int(opr[1])] = reg[opr[0]]
     implicit_reg['pc'] = implicit_reg['pc']+1
 def MOV(opr):
     reg[opr[0]] = int(opr[1])
