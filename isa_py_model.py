@@ -6,16 +6,20 @@ MEM_SIZE = 128000000
 comment = ('#','//')
 reg = {'r0' : 0, 'r1' : 0, 'r2' : 0, 'r3' : 0, 'r4' : 0, 'r5' : 0, 'r6' : 0,'r7' :  0, 'r8' : 0, 'r9' : 0, 'r10' : 0, 'r11' : 0, 'r12' : 0, 'r13' : 0, 'r14' : 0, 'r15' : 0}
 # 코드 길이상 16개만 예시로 들었음.
-vreg = {'vr0' : {'0' : 0, '1' : 0, '2' : 0, '3' : 0, '4' : 0, '5' : 0, '6' : 0, '7' : 0, '8' : 0, '9' : 0, '10' : 0, '11' : 0, '12' : 0, '13' : 0, '14' : 0, '15' : 0}}
+vreg = {'vr0' : {0 : 0, 1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0, 13 : 0, 14 : 0, 15 : 0}}
 implicit_reg = {'EXIT': False, 'pc': 0, 'cmpreg': 0}
 
-memory  = [0] * MEM_SIZE
-imemory = [0] * MEM_SIZE
+memory  = [np.uint32(0)] * MEM_SIZE
+imemory = [np.uint32(0)] * MEM_SIZE
 
 # Memory Load Process
 image = np.load('lena_gray.npy')
-for i in range(0, image.shape[0]):
-    memory[i] = image[i]
+#for i in range(0, image.shape[0]):
+    #memory[i] = image[i]
+memory[0] = 169090600
+memory[1] = 338181200
+memory[2] = 507271800
+memory[3] = 676362400
 krn = np.load('sobel_x_kernel.npy')
 for i in range(0, krn.shape[0]):
     memory[5000000+i] = krn[i]
@@ -116,7 +120,7 @@ def __DEBUG_PRTREG(opr):
     print(reg[opr[0]])
     implicit_reg['pc'] = implicit_reg['pc']+1
 def __DEBUG_PRTVREG(opr):
-    print(vreg['vr0'])
+    print(vreg[opr[0]])
     implicit_reg['pc'] = implicit_reg['pc']+1
 def __DEBUG_PRT_SUC_MSG(msg):
     print(msg+' test success!')
