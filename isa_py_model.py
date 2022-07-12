@@ -16,10 +16,6 @@ imemory = [np.uint32(0)] * MEM_SIZE
 
 # Memory Load Process
 
-# image is not correctly arranged.. so optimization needs
-# image = np.load('lena_gray.npy')
-# for i in range(0, image.shape[0]):
-    #memory[i] = image[i]
 memory[0] = 169090600
 memory[1] = 338181200
 memory[2] = 507271800
@@ -110,13 +106,13 @@ def JNE(opr):
 # Debug function // 그런데, 해저드를 생각하면 DEBUG_PASS를 NOP로 사용하는게 옳지 않을까? -> hazard를 보기
 def __DEBUG_PASS(opr):
     implicit_reg['pc'] = implicit_reg['pc']+1  
-def __DEBUG_PRTREG(opr):
+def __DEBUG_PRT_REG(opr):
     print(reg[opr[0]])
     implicit_reg['pc'] = implicit_reg['pc']+1
-def __DEBUG_PRTVREG(opr):
+def __DEBUG_PRT_VREG(opr):
     print(vreg[opr[0]])
     implicit_reg['pc'] = implicit_reg['pc']+1
-def __DEBUG_MEMVIEW(opr):
+def __DEBUG_MEM_VIEW(opr):
     for i in range(int(opr[0]), int(opr[1])+1):
         print('memory[' + str(i) + '] : ' + str(memory[i]))
     implicit_reg['pc'] = implicit_reg['pc']+1
@@ -125,8 +121,16 @@ def __DEBUG_PRT_MSG(msg):
         print(msg[i], end=' ')
     print()
     implicit_reg['pc'] = implicit_reg['pc']+1
-
-# Shutdown
+def __DEBUG_MEM_2_FILE(opr):
+    np.save('./' + opr[2], memory[opr[0]:opr[1]+1])
+    implicit_reg['pc'] = implicit_reg['pc']+1
+def __DEBUG_FILE_2_MEM(opr):
+    # TODO
+    image = np.load(opr[0]+'.npy')
+    for i in range(opr[1], image.shape[0]):
+        memory[i] = image[i]
+    print('File '+str(opr[0]+' is loaded to Memory['+opr[1]+'] to Memory'+opr[2]+']'))
+    implicit_reg['pc'] = implicit_reg['pc']+1
 def __DEBUG_EXIT(opr):
     implicit_reg['EXIT'] = True
     implicit_reg['pc'] = implicit_reg['pc']+1
@@ -134,17 +138,12 @@ def __DEBUG_EXIT(opr):
 # SYSTEM
 def __EXEC_ASM():
     while implicit_reg['EXIT'] == False:
-        if int(implicit_reg['pc'])>MEM_SIZE:
-            implicit_reg['EXIT'] == True
-            break
-        i = implicit_reg['pc']
         if implicit_reg['DEBUG_PC_SHOW'] == True:
             print("current pc : " + str(implicit_reg['pc']))
-        #if(implicit_reg['pc'] == 1180425):
-            #np.save('./output_lightweight', memory[7000000:7000256])
-        op = globals()[imemory[i][0]]
-        op(imemory[i][1:])
+        op = globals()[imemory[implicit_reg['pc']][0]]
+        op(imemory[implicit_reg['pc']][1:])
         pass
+    
 def __INIT_IMEM():
     file = open('./new_test.asm', 'r')
     for line in file:
