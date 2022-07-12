@@ -3,11 +3,10 @@ import numpy as np
 
 # Memory is 128MB both data & instruction
 MEM_SIZE = 128000000
-comment = ('#','//')
 reg = {'r0' : 0, 'r1' : 0, 'r2' : 0, 'r3' : 0, 'r4' : 0, 'r5' : 0, 'r6' : 0,'r7' :  0, 'r8' : 0, 'r9' : 0, 'r10' : 0, 'r11' : 0, 'r12' : 0, 'r13' : 0, 'r14' : 0, 'r15' : 0}
-# 코드 길이상 16개만 예시로 들었음.
+#vreg will only use 8bit data-types # this is 8*16 = 128b, and will be increased 
 vreg = {'vr0' : {0 : 0, 1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0, 13 : 0, 14 : 0, 15 : 0},
-        'vr1' : {0 : -1, 1 : 1, 2 : -1, 3 : 1, 4 : -1, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0, 13 : 0, 14 : 0, 15 : 0}, 
+        'vr1' : {0 : 0, 1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0, 13 : 0, 14 : 0, 15 : 0}, 
         'vr2' : {0 : 0, 1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0, 13 : 0, 14 : 0, 15 : 0}}
 implicit_reg = {'DEBUG_PC_SHOW' : False, 'EXIT': False, 'pc': 0, 'cmpreg': 0}
 
@@ -15,14 +14,14 @@ memory  = [np.uint32(0)] * MEM_SIZE
 imemory = [np.uint32(0)] * MEM_SIZE
 
 # Memory Load Process
-
-memory[0] = 169090600
-memory[1] = 338181200
-memory[2] = 507271800
-memory[3] = 676362400
+memory[0] = 169090600 # 10  20  30  40
+memory[1] = 338181200 # 20  40  60  80 
+memory[2] = 507271800 # 30  60  90  120
+memory[3] = 676362400 # 40  80  120 160
 
 # Memory operation
 def LOAD_V(opr):
+    # TODO Load 는 4bytes 단위로 그냥 load 하고, 계산시에는 두개를 줘야하지 않나? 중간에 type casting되는걸 생각해봐야함. 어차피 Block Diagram에서도 생각해야하는 문제이기 때문.
     for i in range(0, 4): #will be 49
         vreg[opr[0]][i*4+0] = (memory[reg[opr[1]]+i] & 0xFF000000) >> 24
         vreg[opr[0]][i*4+1] = (memory[reg[opr[1]]+i] & 0xFF0000) >> 16
@@ -31,6 +30,7 @@ def LOAD_V(opr):
     implicit_reg['pc'] = implicit_reg['pc']+1
 def LOAD_VS(opr):
     # TODO
+    # Stride는 byte 단위로 하니까, 이것은 사용자가 생각할 문제임. 굳이 여기서 어렵게 할 필요가 없음.
     implicit_reg['pc'] = implicit_reg['pc']+1
 def LOAD_S(opr):
     reg[opr[0]]=memory[int(opr[1])]
@@ -147,7 +147,7 @@ def __EXEC_ASM():
 def __INIT_IMEM():
     file = open('./new_test.asm', 'r')
     for line in file:
-        if line.startswith(comment[:]):
+        if line.startswith('#', '//'):
             continue
         instruction = line.split() 
         if instruction:
