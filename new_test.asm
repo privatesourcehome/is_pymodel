@@ -1,0 +1,4 @@
+0 MOV r0 1
+1 LOAD_V vr0 r0
+2 __DEBUG_PRTVREG vr0
+3 __DEBUG_EXIT
